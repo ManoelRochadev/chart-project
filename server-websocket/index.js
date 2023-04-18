@@ -8,20 +8,18 @@ const server = app.listen(process.env.PORT || 3000, () => {
     
 })
 
-const wss = appWs(server);
+export const wss = appWs(server);
  
-// gerar 100 numeros aleátorios e enviar para o cliente
  wss.on('connection', (ws) => {
     console.log('Client connected');
-    ws.on('message', (message) => {
-        console.log('received: %s', message);
-    });
-    ws.send('something');
+    
     watchFile(data => {
-      console.log(data);
-      wss.clients.forEach(client => {
-          client.send(JSON.stringify({data}));
-      });
-  });
+        console.log(data);
+        setInterval(() => {
+            wss.clients.forEach(client => {
+                client.send(JSON.stringify({data}));
+            });
+        }, 1000);
+    });
 });
 

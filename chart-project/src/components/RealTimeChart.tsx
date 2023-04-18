@@ -3,12 +3,20 @@ import Plot from 'react-plotly.js';
 import { JsonValue } from 'react-use-websocket/dist/lib/types';
 import useWebSocket from 'react-use-websocket';
 
+type Activity = {
+  requisicoes_por_segundo: number;
+}
+
+type lastMessage = {
+  data: Activity[];
+}
+
 export function RealtimeLineChart() {
   const [data, setData] = useState({} as JsonValue);
   const [layout, setLayout] = useState({});
   const [frames, setFrames] = useState([]);
 
-  const { lastJsonMessage } = useWebSocket('ws://localhost:3333/',
+  const { lastJsonMessage } = useWebSocket<lastMessage>('ws://localhost:3333/',
   {
     onOpen: () => console.log('opened'),
     onError: (err) => console.log(err),
