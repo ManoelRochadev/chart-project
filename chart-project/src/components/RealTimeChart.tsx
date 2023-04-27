@@ -1,67 +1,52 @@
 import { useState, useEffect } from 'react';
-import Plot from 'react-plotly.js';
-import { JsonValue } from 'react-use-websocket/dist/lib/types';
 import useWebSocket from 'react-use-websocket';
-
-type Activity = {
-  requisicoes_por_segundo: number;
-}
+import { Chart } from "react-google-charts";
+import { SpinnerGap } from '@phosphor-icons/react'
+import './RealtimeChart.css'
 
 type lastMessage = {
-  data: Activity[];
+  segundo: number;
+  requisicoes: number;
 }
 
 export function RealtimeLineChart() {
-  const [data, setData] = useState({} as JsonValue);
-  const [layout, setLayout] = useState({});
-  const [frames, setFrames] = useState([]);
-
-  const { lastJsonMessage } = useWebSocket<lastMessage>('ws://localhost:3333/',
-  {
+  const [dados, setDados] = useState<Array<[number, number]>>([]);
+  const { lastJsonMessage } = useWebSocket<lastMessage>('ws://localhost:3333/', {
     onOpen: () => console.log('opened'),
     onError: (err) => console.log(err),
     shouldReconnect: () => true,
     reconnectInterval: 2000,
   });
 
-  const activities = lastJsonMessage?.data
-
   useEffect(() => {
+    const activities = lastJsonMessage;
+
     if (activities) {
-      setData(activities.map((activity) => activity.requisicoes_por_segundo));
+      setDados((prevDados) => [...prevDados, [Number(activities.segundo), Number(activities.requisicoes)]]);
     }
-  }, [activities]);
+  }, [lastJsonMessage]);
 
-  useEffect(() => {
-    setLayout({
-      title: 'Realtime Line Chart',
-      xaxis: {
-        title: 'Time',
-        showgrid: false,
-        zeroline: false
-      },
-      yaxis: {
-        title: 'Value',
-        showline: false
-      }
-    });
-
-    setFrames([{
-      data: [{ y: data }],
-      traces: [0],
-    },
-    ]);
-  }, [data]);
+  if (dados.length === 0) {
+    return (
+      <div>
+        <SpinnerGap size="50px" className='spinner' />
+      </div>
+    )
+  }
 
   return (
-    <Plot
-      data={[{
-        y: data,
-        mode: 'lines',
-        line: { color: '#80CAF6' }
-      }]}
-      layout={layout}
-      frames={frames}
+    <Chart
+      chartType="LineChart"
+      data={[['segundo', 'requisicoes'], ...dados]}
+      options={{
+        title: "Monitoramento banco de dados",
+        legend: { position: "bottom" },
+        hAxis: { title: "segundo", viewWindow: { min: 0, max: 1000 } },
+        vAxis: { title: "Número de Requisições", viewWindow: { min: 0, max: 35000 } },
+        is3D: true,
+      }}
+      width="100vw"
+      height="620px"
     />
-  )
+  );
 }

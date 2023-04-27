@@ -1,0 +1,16 @@
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Aplique a animação ao elemento */
+.spinner {
+  animation-name: rotate;
+  animation-duration: 2s; /* Duração da animação */
+  animation-timing-function: linear; /* Função de temporização da animação */
+  animation-iteration-count: infinite; /* Repetir a animação infinitamente */
+}

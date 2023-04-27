@@ -1,4 +1,4 @@
-import {WebSocketServer} from 'ws';
+import { WebSocketServer } from 'ws';
 
 function onError(ws, err) {
     console.error(`onError: ${err.message}`);
