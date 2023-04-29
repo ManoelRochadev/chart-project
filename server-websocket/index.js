@@ -1,7 +1,6 @@
 //index.js
 import app from './app.js';
 import appWs from './app-ws.js';
-import { watchFile } from './watchFileCSV.js';
 import { lerArquivoCSV } from './lerArquivoCSV.js';
 
 const server = app.listen(process.env.PORT || 3000, () => {
