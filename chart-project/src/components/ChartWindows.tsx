@@ -9,7 +9,7 @@ type lastMessage = {
   requisicoes: number;
 }
 
-export function RealtimeLineChart() {
+export function ChartWindows() {
   const [dados, setDados] = useState<Array<[number, number]>>([]);
   const { lastJsonMessage } = useWebSocket<lastMessage>('wss://seashell-app-vr7p7.ondigitalocean.app/', {
     onOpen: () => console.log('opened'),
@@ -36,15 +36,17 @@ export function RealtimeLineChart() {
 
   const maxSegundos = dados[dados.length - 1][0] + 10; // adiciona 10 segundos extras para a visualização
   const maxRequisicoes = 35000; // número máximo de requisições que será exibido no gráfico
-
+  const tempoMaximoExibido = 20; // tempo máximo (em segundos) exibido no gráfico
+  const tempoMinimoExibido = Math.max(dados[0][0], maxSegundos - tempoMaximoExibido); // calcula o tempo mínimo (em segundos) exibido no gráfico
+  
   return (
     <Chart
       chartType="LineChart"
       data={[['segundo', 'requisicoes'], ...dados]}
       options={{
-        title: "Monitoramento banco de dados",
+        title: "Monitoramento banco de dados igual ao gereciador de tarefas do Windows",
         legend: { position: "bottom" },
-        hAxis: { title: "segundo", viewWindow: { min: 0, max: maxSegundos } },
+        hAxis: { title: "segundo", viewWindow: { min: tempoMinimoExibido, max: maxSegundos } },
         vAxis: { title: "Número de Requisições", viewWindow: { min: 0, max: maxRequisicoes } },
         is3D: true,
       }}
